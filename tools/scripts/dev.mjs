@@ -1,7 +1,39 @@
 import { spawn } from 'node:child_process';
+import net from 'node:net';
 
 const shouldStartMock =
   process.argv.includes('--mock') || process.env.npm_config_mock === 'true';
+
+const mockPort = Number(process.env.MOCK_API_PORT ?? 3333);
+
+function isPortOpen(port) {
+  return new Promise((resolve) => {
+    const socket = net.createConnection({ host: '127.0.0.1', port });
+
+    socket.once('connect', () => {
+      socket.end();
+      resolve(true);
+    });
+
+    socket.once('error', () => {
+      resolve(false);
+    });
+  });
+}
+
+async function isExistingMockHealthy() {
+  try {
+    const response = await fetch(`http://127.0.0.1:${mockPort}/api/billing/dashboard`);
+    return response.ok;
+  } catch {
+    return false;
+  }
+}
+
+const shouldReuseMock =
+  shouldStartMock &&
+  (await isPortOpen(mockPort)) &&
+  (await isExistingMockHealthy());
 
 const commands = [
   {
@@ -9,7 +41,7 @@ const commands = [
     command: 'pnpm',
     args: ['nx', 'serve', 'shell'],
   },
-  ...(shouldStartMock
+  ...(shouldStartMock && !shouldReuseMock
     ? [
         {
           label: 'mock',
@@ -92,6 +124,10 @@ process.on('SIGINT', () => {
 process.on('SIGTERM', () => {
   stopChildren('SIGTERM', 0);
 });
+
+if (shouldReuseMock) {
+  console.log(`[mock] reusing existing mock API on port ${mockPort}`);
+}
 
 for (const command of commands) {
   startProcess(command);

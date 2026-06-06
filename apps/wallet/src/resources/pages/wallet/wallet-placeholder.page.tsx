@@ -1,4 +1,8 @@
-import { REMOTE_ROUTE_META } from '@modular-payments-console/config';
+import {
+  createShellPageContext,
+  REMOTE_ROUTE_META,
+} from '@modular-payments-console/config';
+import { useSyncShellPageContext } from '@modular-payments-console/event-bus';
 import {
   Badge,
   Card,
@@ -16,7 +20,11 @@ export function WalletPlaceholderPage({
   sectionId: 'balance' | 'transfers';
 }) {
   const remote = REMOTE_ROUTE_META.wallet;
-  const section = remote.sections.find(currentSection => currentSection.id === sectionId);
+  const section = remote.sections.find(
+    (currentSection) => currentSection.id === sectionId,
+  );
+
+  useSyncShellPageContext(createShellPageContext(remote.id, sectionId));
 
   return (
     <section className="min-w-0 space-y-6">
@@ -44,12 +52,12 @@ export function WalletPlaceholderPage({
           </CardHeader>
           <CardContent className="space-y-3 text-sm leading-6 text-muted-foreground">
             <p>
-              Future treasury widgets, payout tables and filters will stay internal to
-              wallet without leaking state back into the shell.
+              Future treasury widgets, payout tables and filters will stay
+              internal to wallet without leaking state back into the shell.
             </p>
             <p>
-              The shared cache and shell layout are already in place for that future
-              evolution.
+              The shared cache and shell layout are already in place for that
+              future evolution.
             </p>
           </CardContent>
         </Card>
@@ -58,8 +66,8 @@ export function WalletPlaceholderPage({
           <CardHeader>
             <CardTitle>Future expansion area</CardTitle>
             <CardDescription>
-              Reserved for wallet-specific controls, detail panels and operational
-              widgets once the real product flow is defined.
+              Reserved for wallet-specific controls, detail panels and
+              operational widgets once the real product flow is defined.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-2 text-sm text-muted-foreground">

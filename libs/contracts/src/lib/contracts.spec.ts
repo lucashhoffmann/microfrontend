@@ -1,6 +1,7 @@
 import {
   RemoteDashboardResponse,
   RemoteRouteMeta,
+  ShellEventMap,
   ShellNavGroup,
 } from './contracts';
 
@@ -58,9 +59,17 @@ describe('contracts', () => {
         },
       ],
     };
+    const shellEvent: ShellEventMap['shell:page-context'] = {
+      remoteId: 'billing',
+      label: 'Billing',
+      title: 'Billing command center',
+      description: 'Monitor placeholder charging flows.',
+      breadcrumbs: ['Operations', 'Billing', 'Overview'],
+    };
 
     expect(billingRemote.defaultPath).toBe('/billing/overview');
     expect(dashboard.stats[0].title).toBe('MRR');
     expect(navGroup.items[0].iconKey).toBe('receipt-text');
+    expect(shellEvent.breadcrumbs.at(-1)).toBe('Overview');
   });
 });

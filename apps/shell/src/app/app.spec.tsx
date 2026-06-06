@@ -60,60 +60,62 @@ describe('Shell App', () => {
       }),
     );
 
-    (global.fetch as jest.Mock).mockImplementation((input: RequestInfo | URL) => {
-      const url = input.toString();
+    (global.fetch as jest.Mock).mockImplementation(
+      (input: RequestInfo | URL) => {
+        const url = input.toString();
 
-      if (url.endsWith('/auth/me')) {
-        return Promise.resolve({
-          ok: true,
-          status: 200,
-          headers: {
-            get: () => 'application/json',
-          },
-          json: async () => ({
-            token: 'mock-token:user_demo',
-            user: {
-              id: 'user_demo',
-              name: 'Demo Operator',
-              email: 'demo@modular-payments.local',
+        if (url.endsWith('/auth/me')) {
+          return Promise.resolve({
+            ok: true,
+            status: 200,
+            headers: {
+              get: () => 'application/json',
             },
-          }),
-        });
-      }
-
-      if (url.endsWith('/billing/dashboard')) {
-        return Promise.resolve({
-          ok: true,
-          status: 200,
-          headers: {
-            get: () => 'application/json',
-          },
-          json: async () => ({
-            remoteId: 'billing',
-            title: 'Billing overview',
-            description: 'Billing placeholder dashboard',
-            stats: [
-              {
-                id: 'open-invoices',
-                title: 'Open invoices',
-                value: '128',
-                helper: '14 due this week',
+            json: async () => ({
+              token: 'mock-token:user_demo',
+              user: {
+                id: 'user_demo',
+                name: 'Demo Operator',
+                email: 'demo@modular-payments.local',
               },
-            ],
-            activity: [
-              {
-                id: 'billing-1',
-                title: 'Card retry campaign',
-                summary: 'Retry sequence scheduled for demo subscriptions.',
-                status: 'in-progress',
-              },
-            ],
-          }),
-        });
-      }
+            }),
+          });
+        }
 
-      return Promise.reject(new Error(`Unhandled fetch mock for ${url}`));
-    });
+        if (url.endsWith('/billing/dashboard')) {
+          return Promise.resolve({
+            ok: true,
+            status: 200,
+            headers: {
+              get: () => 'application/json',
+            },
+            json: async () => ({
+              remoteId: 'billing',
+              title: 'Billing overview',
+              description: 'Billing placeholder dashboard',
+              stats: [
+                {
+                  id: 'open-invoices',
+                  title: 'Open invoices',
+                  value: '128',
+                  helper: '14 due this week',
+                },
+              ],
+              activity: [
+                {
+                  id: 'billing-1',
+                  title: 'Card retry campaign',
+                  summary: 'Retry sequence scheduled for demo subscriptions.',
+                  status: 'in-progress',
+                },
+              ],
+            }),
+          });
+        }
+
+        return Promise.reject(new Error(`Unhandled fetch mock for ${url}`));
+      },
+    );
 
     render(
       <MemoryRouter initialEntries={['/auth/login']}>
@@ -123,6 +125,9 @@ describe('Shell App', () => {
 
     expect(
       await screen.findByRole('heading', { name: /billing command center/i }),
+    ).toBeTruthy();
+    expect(
+      await screen.findByText('Operations / Billing / Overview'),
     ).toBeTruthy();
 
     await waitFor(() => {

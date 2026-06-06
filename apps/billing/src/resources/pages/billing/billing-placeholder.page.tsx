@@ -1,4 +1,8 @@
-import { REMOTE_ROUTE_META } from '@modular-payments-console/config';
+import {
+  createShellPageContext,
+  REMOTE_ROUTE_META,
+} from '@modular-payments-console/config';
+import { useSyncShellPageContext } from '@modular-payments-console/event-bus';
 import {
   Badge,
   Card,
@@ -16,7 +20,11 @@ export function BillingPlaceholderPage({
   sectionId: 'charges' | 'plans';
 }) {
   const remote = REMOTE_ROUTE_META.billing;
-  const section = remote.sections.find(currentSection => currentSection.id === sectionId);
+  const section = remote.sections.find(
+    (currentSection) => currentSection.id === sectionId,
+  );
+
+  useSyncShellPageContext(createShellPageContext(remote.id, sectionId));
 
   return (
     <section className="min-w-0 space-y-6">
@@ -44,12 +52,12 @@ export function BillingPlaceholderPage({
           </CardHeader>
           <CardContent className="space-y-3 text-sm leading-6 text-muted-foreground">
             <p>
-              The final domain rules for {section?.label.toLowerCase()} can be added later
-              without changing the federation boundary.
+              The final domain rules for {section?.label.toLowerCase()} can be
+              added later without changing the federation boundary.
             </p>
             <p>
-              Zustand remains global only for shell concerns, while this route keeps its
-              future state local to billing.
+              Zustand remains global only for shell concerns, while this route
+              keeps its future state local to billing.
             </p>
           </CardContent>
         </Card>
@@ -58,8 +66,8 @@ export function BillingPlaceholderPage({
           <CardHeader>
             <CardTitle>Future expansion area</CardTitle>
             <CardDescription>
-              Reserved for billing-specific workflows, tables and internal orchestration
-              once domain rules are defined.
+              Reserved for billing-specific workflows, tables and internal
+              orchestration once domain rules are defined.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-2 text-sm text-muted-foreground">

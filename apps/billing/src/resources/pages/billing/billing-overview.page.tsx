@@ -1,4 +1,8 @@
-import { REMOTE_ROUTE_META } from '@modular-payments-console/config';
+import {
+  createShellPageContext,
+  REMOTE_ROUTE_META,
+} from '@modular-payments-console/config';
+import { useSyncShellPageContext } from '@modular-payments-console/event-bus';
 import {
   Badge,
   Card,
@@ -17,12 +21,16 @@ export function BillingOverviewPage() {
   const remote = REMOTE_ROUTE_META.billing;
   const dashboard = useBillingDashboardUseCase();
 
+  useSyncShellPageContext(createShellPageContext(remote.id, 'overview'));
+
   return (
     <section className="min-w-0 space-y-6">
       <header className="space-y-3">
         <Badge variant={getRemoteBadgeVariant(remote.id)}>{remote.label}</Badge>
         <div className="space-y-2">
-          <h1 className="text-3xl font-semibold tracking-tight">{remote.headline}</h1>
+          <h1 className="text-3xl font-semibold tracking-tight">
+            {remote.headline}
+          </h1>
           <p className="max-w-3xl text-sm leading-6 text-muted-foreground">
             {remote.description}
           </p>
@@ -35,7 +43,7 @@ export function BillingOverviewPage() {
           ? Array.from({ length: 3 }).map((_, index) => (
               <Skeleton key={index} className="h-36 rounded-md" />
             ))
-          : dashboard.data?.stats.map(stat => (
+          : dashboard.data?.stats.map((stat) => (
               <Card key={stat.id} className="min-w-0 border-border/70">
                 <CardHeader>
                   <CardDescription>{stat.title}</CardDescription>
@@ -51,7 +59,9 @@ export function BillingOverviewPage() {
       <div className="grid min-w-0 gap-4 xl:grid-cols-[minmax(0,1.3fr)_minmax(0,0.7fr)]">
         <Card className="min-w-0 border-border/70">
           <CardHeader>
-            <CardTitle>{dashboard.data?.title ?? 'Loading billing dashboard'}</CardTitle>
+            <CardTitle>
+              {dashboard.data?.title ?? 'Loading billing dashboard'}
+            </CardTitle>
             <CardDescription>
               {dashboard.data?.description ??
                 'Fetching placeholder billing orchestration data from the mock API.'}
@@ -64,7 +74,7 @@ export function BillingOverviewPage() {
                 <Skeleton className="h-16 rounded-lg" />
               </>
             ) : (
-              dashboard.data?.activity.map(item => (
+              dashboard.data?.activity.map((item) => (
                 <div
                   key={item.id}
                   className="rounded-md border border-border/60 bg-background/70 p-4"
@@ -92,14 +102,17 @@ export function BillingOverviewPage() {
             <CardTitle>Remote-ready structure</CardTitle>
             <CardDescription>
               This overview demonstrates shared theme, shared auth and shared
-              server-state while keeping billing-specific routing internal to the remote.
+              server-state while keeping billing-specific routing internal to
+              the remote.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3 text-sm leading-6 text-muted-foreground">
-            <p>Providers come from the shell when composed via Module Federation.</p>
             <p>
-              The remote still stays runnable in isolation because it mounts its own
-              providers in standalone mode.
+              Providers come from the shell when composed via Module Federation.
+            </p>
+            <p>
+              The remote still stays runnable in isolation because it mounts its
+              own providers in standalone mode.
             </p>
           </CardContent>
         </Card>

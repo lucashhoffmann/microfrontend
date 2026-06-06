@@ -1,6 +1,6 @@
 import { lazy, ReactNode, Suspense, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { createApiClient } from '@modular-payments-console/api-client';
 import {
   authSelectors,
@@ -8,7 +8,11 @@ import {
   syncAuthStoreFromStorage,
   useAuthStore,
 } from '@modular-payments-console/auth';
-import { API_BASE_URL, AUTH_ROUTES, PRIVATE_HOME_ROUTE } from '@modular-payments-console/config';
+import {
+  API_BASE_URL,
+  AUTH_ROUTES,
+  PRIVATE_HOME_ROUTE,
+} from '@modular-payments-console/config';
 import { AuthSession } from '@modular-payments-console/contracts';
 import {
   Card,
@@ -19,6 +23,7 @@ import {
 } from '@modular-payments-console/ui';
 import { PrivateShellLayout } from '../../resources/layouts/private-shell-layout/private-shell-layout.component';
 import { PublicShellLayout } from '../../resources/layouts/public-shell-layout/public-shell-layout.component';
+import { FederatedRemoteBoundary } from '../../resources/components/base/federated-remote-boundary/federated-remote-boundary.component';
 
 const AuthRoutes = lazy(() => import('auth/Routes'));
 const BillingRoutes = lazy(() => import('billing/Routes'));
@@ -58,9 +63,9 @@ function ShellLoadingState({
 function useSessionBootstrap() {
   const token = useAuthStore(authSelectors.token);
   const bootstrapStatus = useAuthStore(authSelectors.bootstrapStatus);
-  const setBootstrapStatus = useAuthStore(state => state.setBootstrapStatus);
-  const hydrateSession = useAuthStore(state => state.hydrateSession);
-  const clearSession = useAuthStore(state => state.clearSession);
+  const setBootstrapStatus = useAuthStore((state) => state.setBootstrapStatus);
+  const hydrateSession = useAuthStore((state) => state.hydrateSession);
+  const clearSession = useAuthStore((state) => state.clearSession);
 
   const sessionQuery = useQuery({
     queryKey: ['auth-session', token],
@@ -172,6 +177,25 @@ function ProtectedRemoteFrame({ children }: { children: ReactNode }) {
   return <PrivateShellLayout>{children}</PrivateShellLayout>;
 }
 
+function FederatedRemoteSlot({
+  children,
+  remoteLabel,
+}: {
+  children: ReactNode;
+  remoteLabel: string;
+}) {
+  const location = useLocation();
+
+  return (
+    <FederatedRemoteBoundary
+      remoteLabel={remoteLabel}
+      resetKey={location.pathname}
+    >
+      {children}
+    </FederatedRemoteBoundary>
+  );
+}
+
 export function ShellRouter() {
   return (
     <Suspense
@@ -188,7 +212,9 @@ export function ShellRouter() {
           path="/auth/*"
           element={
             <PublicRemoteFrame>
-              <AuthRoutes />
+              <FederatedRemoteSlot remoteLabel="Auth remote">
+                <AuthRoutes />
+              </FederatedRemoteSlot>
             </PublicRemoteFrame>
           }
         />
@@ -196,7 +222,9 @@ export function ShellRouter() {
           path="/billing/*"
           element={
             <ProtectedRemoteFrame>
-              <BillingRoutes />
+              <FederatedRemoteSlot remoteLabel="Billing remote">
+                <BillingRoutes />
+              </FederatedRemoteSlot>
             </ProtectedRemoteFrame>
           }
         />
@@ -204,7 +232,9 @@ export function ShellRouter() {
           path="/wallet/*"
           element={
             <ProtectedRemoteFrame>
-              <WalletRoutes />
+              <FederatedRemoteSlot remoteLabel="Wallet remote">
+                <WalletRoutes />
+              </FederatedRemoteSlot>
             </ProtectedRemoteFrame>
           }
         />
@@ -212,7 +242,9 @@ export function ShellRouter() {
           path="/analytics/*"
           element={
             <ProtectedRemoteFrame>
-              <AnalyticsRoutes />
+              <FederatedRemoteSlot remoteLabel="Analytics remote">
+                <AnalyticsRoutes />
+              </FederatedRemoteSlot>
             </ProtectedRemoteFrame>
           }
         />

@@ -36,6 +36,17 @@ await db.read();
 const dataApp = createJsonServerApp(db, { logger: false });
 const app = new App();
 
+const RESPONSE_DELAY_MS = Number(process.env.MOCK_API_RESPONSE_DELAY_MS ?? 1500);
+
+function delayResponse(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+app.use(async (req, _res, next) => {
+  await delayResponse(RESPONSE_DELAY_MS);
+  next();
+});
+
 app.use(
   cors({
     origin: [

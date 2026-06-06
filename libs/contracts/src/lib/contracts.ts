@@ -5,6 +5,18 @@ export type ColorTheme = 'default' | 'violet' | 'red' | 'green' | 'blue';
 
 export type AppEventMap = Record<string, unknown>;
 
+export interface ShellPageContext {
+  label: string;
+  title: string;
+  description: string;
+  breadcrumbs: string[];
+  remoteId?: RemoteId;
+}
+
+export interface ShellEventMap extends AppEventMap {
+  'shell:page-context': ShellPageContext;
+}
+
 export type ActivityStatus =
   | 'ready'
   | 'queued'

@@ -26,11 +26,11 @@ const sidebarIcons = {
 
 export function AppSidebar() {
   const location = useLocation();
-  const user = useAuthStore(state => state.session?.user ?? null);
+  const user = useAuthStore((state) => state.session?.user ?? null);
   const userInitials =
     user?.name
       ?.split(' ')
-      .map(part => part.charAt(0))
+      .map((part) => part.charAt(0))
       .join('')
       .slice(0, 2)
       .toUpperCase() ?? 'D';
@@ -42,7 +42,7 @@ export function AppSidebar() {
           <SidebarMenuItem>
             <SidebarMenuButton size="lg">
               <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 shrink-0 items-center justify-center rounded-md text-sm font-semibold tracking-[0.12em]">
-                <span>MPC</span>
+                <span>M</span>
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden">
                 <span className="truncate font-semibold">{APP_TITLE}</span>
@@ -56,11 +56,11 @@ export function AppSidebar() {
       </SidebarHeader>
 
       <SidebarContent>
-        {SHELL_NAV_GROUPS.map(group => (
+        {SHELL_NAV_GROUPS.map((group) => (
           <SidebarGroup key={group.id}>
             <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
             <SidebarMenu>
-              {group.items.map(item => {
+              {group.items.map((item) => {
                 const Icon = sidebarIcons[item.iconKey];
                 const isActive = location.pathname.startsWith(
                   item.remoteId ? `/${item.remoteId}` : item.path,

@@ -1,6 +1,7 @@
 import {
   RemoteId,
   RemoteRouteMeta,
+  ShellPageContext,
   ShellNavGroup,
   ShellNavItem,
 } from '@modular-payments-console/contracts';
@@ -12,8 +13,7 @@ export const MOCK_API_PORT = 3333;
 export const API_BASE_URL = `http://localhost:${MOCK_API_PORT}/api`;
 export const AUTH_STORAGE_KEY = 'modular-payments-console.auth';
 export const THEME_STORAGE_KEY = 'modular-payments-console.theme';
-export const THEME_COLOR_STORAGE_KEY =
-  'modular-payments-console.theme-color';
+export const THEME_COLOR_STORAGE_KEY = 'modular-payments-console.theme-color';
 
 export const AUTH_ROUTES = {
   login: '/auth/login',
@@ -26,6 +26,14 @@ export const DEMO_CREDENTIALS = {
   email: 'demo@modular-payments.local',
   password: 'Password123!',
 } as const;
+
+export const DEFAULT_SHELL_PAGE_CONTEXT: ShellPageContext = {
+  label: 'Shell',
+  title: 'Secure shell workspace',
+  description:
+    'Shared theme, shared cache and federated remotes orchestrated in one host.',
+  breadcrumbs: ['Operations', 'Shell'],
+};
 
 export const REMOTE_ROUTE_META: Record<RemoteId, RemoteRouteMeta> = {
   billing: {
@@ -42,13 +50,15 @@ export const REMOTE_ROUTE_META: Record<RemoteId, RemoteRouteMeta> = {
         id: 'overview',
         label: 'Overview',
         path: '/billing/overview',
-        description: 'Executive placeholder metrics and recent billing activity.',
+        description:
+          'Executive placeholder metrics and recent billing activity.',
       },
       {
         id: 'charges',
         label: 'Charges',
         path: '/billing/charges',
-        description: 'A placeholder list for future charge orchestration flows.',
+        description:
+          'A placeholder list for future charge orchestration flows.',
       },
       {
         id: 'plans',
@@ -72,7 +82,8 @@ export const REMOTE_ROUTE_META: Record<RemoteId, RemoteRouteMeta> = {
         id: 'overview',
         label: 'Overview',
         path: '/wallet/overview',
-        description: 'Placeholder metrics, balance visibility and payout context.',
+        description:
+          'Placeholder metrics, balance visibility and payout context.',
       },
       {
         id: 'balance',
@@ -120,6 +131,31 @@ export const REMOTE_ROUTE_META: Record<RemoteId, RemoteRouteMeta> = {
     ],
   },
 };
+
+export function createShellPageContext(
+  remoteId: RemoteId,
+  sectionId?: string,
+): ShellPageContext {
+  const remote = REMOTE_ROUTE_META[remoteId];
+  const fallbackSection = remote.sections[0] ?? {
+    id: 'overview',
+    label: 'Overview',
+    path: remote.defaultPath,
+    description: remote.description,
+  };
+  const section =
+    remote.sections.find((currentSection) => currentSection.id === sectionId) ??
+    fallbackSection;
+
+  return {
+    remoteId,
+    label: remote.label,
+    title: section.id === 'overview' ? remote.headline : section.label,
+    description:
+      section.id === 'overview' ? remote.description : section.description,
+    breadcrumbs: ['Operations', remote.label, section.label],
+  };
+}
 
 const remoteSidebarItems: ShellNavItem[] = [
   {

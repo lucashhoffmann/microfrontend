@@ -3,6 +3,7 @@ export * from './lib/badge';
 export * from './lib/badge-utils';
 export * from './lib/button';
 export * from './lib/card';
+export * from './lib/dialog';
 export * from './lib/dropdown-menu';
 export * from './lib/form';
 export * from './lib/input';

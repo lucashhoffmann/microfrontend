@@ -45,5 +45,6 @@ Thumbs.db
 .agents
 .codex
 AGENTS.md
+.code-review-graph
 
 .nx/polygraph
